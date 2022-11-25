@@ -28,11 +28,13 @@ const resolvers = {
             const token = signToken(user);
             return { token, user };
         },
+
         addUser: async (parent, { username, email, password }) => {
             const user = await User.create({ username, email, password });
             const token = signToken(user);
             return { token, user };
         },
+
         removeBook: async (parent, { bookId }, context) => {
             if (context.user) {
                 const updateUser = await User.fineOneAndUpdate (
@@ -42,6 +44,7 @@ const resolvers = {
             }
             throw new AuthenticationError('Please log in')
         },
+        
         saveBook: async (parent, {book}, context) => {
             if (context.user) {
                 const updateUser = await User.fineOneAndUpdate (
