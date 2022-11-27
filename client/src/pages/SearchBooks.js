@@ -10,13 +10,14 @@ import { Jumbotron, Container, Col, Form, Button, Card, CardColumns } from 'reac
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
-
+import { GET_ME } from '../utils/queries';
 
 const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
+  const { refetch} = useQuery (GET_ME);
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
 
@@ -45,13 +46,14 @@ const SearchBooks = () => {
       }
 
       const { items } = await response.json();
-
+      console.log(items);
       const bookData = items.map((book) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description,
         image: book.volumeInfo.imageLinks?.thumbnail || '',
+        link: book.selfLink,
       }));
 
       setSearchedBooks(bookData);
@@ -75,8 +77,9 @@ const SearchBooks = () => {
 
     try {
       await saveBook({
-        variables: { input: bookToSave }
+        variables: { book: bookToSave }
       });
+      await refetch();
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } 
       catch (err) {

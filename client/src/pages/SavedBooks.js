@@ -16,6 +16,7 @@ const SavedBooks = () => {
   const [removeBook] = useMutation(REMOVE_BOOK);
   const {loading, data} = useQuery (GET_ME);
   const userData = data?.me || [];
+  console.log(userData);
 
   if(!userData?.username) {
     return (
@@ -39,8 +40,8 @@ const SavedBooks = () => {
           const userCache = data.me;
           const savedCache = userCache.savedBooks;
           const updatedCache = savedCache.filter((book) => book.bookId !== bookId);
-          data.me.savedBooks = updatedCache;
-          cache.writeQuery({ query: GET_ME , data: {data: {...data.me.savedBooks}}})
+          // data.me.savedBooks = updatedCache;
+          cache.writeQuery({ query: GET_ME , data: {me: {...data.me, savedBooks:updatedCache}}})
         }
       });
       // upon success, remove book's id from localStorage
@@ -69,6 +70,7 @@ const SavedBooks = () => {
         </h2>
         <CardColumns>
           {userData.savedBooks.map((book) => {
+            console.log(book);
             return (
               <Card key={book.bookId} border='dark'>
                 {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
